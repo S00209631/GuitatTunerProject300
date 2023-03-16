@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project/LogIn/login.dart';
@@ -8,21 +9,17 @@ import 'package:project/MainPages/Recordings.dart';
 import '../MainPages/GuitarTuner.dart';
 import '../MainPages/SettingsPage.dart';
 import '../MainPages/HomePage.dart';
-import '../LogIn/SignUp.dart';
 import '../config.dart';
 import 'drawer_item.dart';
-
 Future  main()  async{
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp( MyApp());
-
 }
 
+//Designing the navigation with drawers
 class NavigationDrawer extends StatelessWidget {
   const NavigationDrawer({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -85,13 +82,9 @@ class NavigationDrawer extends StatelessWidget {
     );
   }
 }
-
-
-
-
+//Navigating drawer items to push to other page
 void onItemPressed(BuildContext context, {required int index}){
     Navigator.pop(context);
-
     switch(index){
       case 0:
       Navigator.push(context, MaterialPageRoute(builder: (context) =>  HomePage()));
@@ -111,17 +104,26 @@ void onItemPressed(BuildContext context, {required int index}){
       case 5:
         Navigator.push(context, MaterialPageRoute(builder: (context) =>  GuitarTuner()));
         break;
-
     }
   }
-
+  //User details on top of nav bar
   Widget headerWidget() {
     return Row(
-
       children: [
-        const CircleAvatar(
-          radius: 40,
-          backgroundImage: NetworkImage('https://iili.io/HXk4GLJ.png'),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.purpleAccent,
+              width: 2.0,
+            ),
+          ),
+          child: GestureDetector(
+            child: CircleAvatar(
+              radius: 40,
+              backgroundImage: NetworkImage('https://iili.io/HXk4GLJ.png'),
+            ),
+          ),
         ),
         const SizedBox(width: 20,),
         Column(

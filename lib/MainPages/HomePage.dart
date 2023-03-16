@@ -1,16 +1,10 @@
-import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_audio_capture/flutter_audio_capture.dart';
-import 'package:pitch_detector_dart/pitch_detector.dart';
-import 'package:pitchupdart/instrument_type.dart';
-import 'package:pitchupdart/pitch_handler.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../LogIn/login.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:project/MainPages/GuitarTuner.dart';
+import 'package:project/MainPages/Recordings.dart';
 import '../NavigationBar/naviigation_drawer.dart';
 import '../config.dart';
-
-
+import 'TutorialsAndVideos.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,7 +12,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  MaterialApp(
-
       theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color.fromARGB(255, 18, 32, 47)),
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -28,150 +21,311 @@ class HomePage extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
   final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage>with TickerProviderStateMixin {
-  late AnimationController _controller;
-
-  bool _isPlay = false;
-  final _audioRecorder = FlutterAudioCapture();
-  final pitchDetectorDart = PitchDetector(44100, 2000);
-  final pitchupDart = PitchHandler(InstrumentType.guitar);
-  var note = "";
-  var frequency = "";
-
-
-  var status = "Click on start";
-  void initState(){
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    );
-  }
+  late bool _dark;
+  get title => null;
   @override
-  void dispose(){
-    _controller.dispose();
-    super.dispose();
-  }
-  Future<void> _startCapture() async {
-    await _audioRecorder.start(listener, onError,
-        sampleRate: 44100, bufferSize: 3000);
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-    runApp(const HomePage());
-    setState(() {
-      note = "";
-    });
+  void initState() {
+    super.initState();
+    _dark = true;
   }
 
-  Future<void> _stopCapture() async {
-    await _audioRecorder.stop();
-    setState(() {
-      note = "";
-    });
-  }
-
-  void listener(dynamic obj) {
-    //Gets the audio sample
-    var buffer = Float64List.fromList(obj.cast<double>());
-    final List<double> audioSample = buffer.toList();
-    //Uses pitch_detector_dart library to detect a pitch from the audio sample
-    final result = pitchDetectorDart.getPitch(audioSample);
-    //If there is a pitch - evaluate it
-    if (result.pitched) {
-      //Uses the pitchupDart library to check a given pitch for a Guitar
-      final handledPitchResult = pitchupDart.handlePitch(result.pitch);
-      //Updates the state with the result
-      setState(() {
-        note = handledPitchResult.note;
-      });
-    }
-  }
-
-  void onError(Object e) {
-    print(e);
+  Brightness _getBrightness() {
+    return _dark ? Brightness.dark : Brightness.light;
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: backgroundColor,
-
-      drawer: const Drawer(
-        child: NavigationDrawer(),
+    return Theme(
+      data: ThemeData(
+        brightness: _getBrightness(),
       ),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(children: [
-          CachedNetworkImage(
-            placeholder: (context, url) => const CircularProgressIndicator(),
-            imageUrl: 'https://i.ibb.co/hFTFj3w/ef4cc64952df617208dd1c9801ddee99-1-1-50-removebg-preview.png',
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        drawer: const Drawer(
+          backgroundColor: backgroundColor,
+          child: NavigationDrawer(),
+        ),
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          brightness: _getBrightness(),
+          iconTheme: IconThemeData(color: _dark ? Colors.white : Colors.black),
+          backgroundColor: Colors.transparent,
+          title: Text(
+            'HomePage',
+            style: TextStyle(color: _dark ? Colors.white : Colors.black),
           ),
-          const Spacer(),
-          Center(
-            child : GestureDetector(
-              onTap : (){
-                if (_isPlay == false){
-                  _controller.forward();
-                  _startCapture();
-                  _isPlay = true;
-                } else{
-                  _controller.reverse();
-                  _stopCapture();
-                  _isPlay = false;
-                }
-              },
-              child: AnimatedIcon(
-                color: Colors.green,
-                icon:AnimatedIcons.play_pause,
-                progress: _controller,
-                size: 100,
-              ),
-            ),
-          ),
-          Center(
-              child: Text(
-                "Note Played ",
-                style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold),
-              )
-          ),
-          Center(
-              child: Text(
-                note,
-                style: const TextStyle(
-                    color: Colors.red,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold),
-              )
-          ),
-          Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                      child: Center(
-                      )),
-                  Expanded(
-                      child: Center(
-                          child: Container(
-                          ))),
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Card(
+                    elevation: 8.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    color: Colors.purple,
+                    child: ListTile(
+                      onTap: () {
+                        //open edit profile
+                      },
+                      title: Text(
+                        "Welcome Back  :    Daniel Stanislawski",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+
+                    ),
+                  ),
+
+                  const SizedBox(height: 10.0),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 16.0), // add a 16 pixel margin at the top
+                  Text(
+                    'Quick Access',
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  Card(
+                    elevation: 4.0,
+                    margin: const EdgeInsets.fromLTRB(32.0, 8.0, 32.0, 16.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(
+                            FontAwesomeIcons.guitar,
+                            color: Colors.purple,
+                          ),
+                          title: Text("Guitar Tuner"),
+                          trailing: Icon(Icons.keyboard_arrow_right),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  GuitarTuner()));
+                          },
+                        ),
+                        _buildDivider(),
+                        ListTile(
+                          leading: Icon(
+                            FontAwesomeIcons.fileAudio,
+                            color: Colors.purple,
+                          ),
+                          title: Text("Saved Recordings"),
+                          trailing: Icon(Icons.keyboard_arrow_right),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => RecorderPage(title: 'Recorded Audios')));
+                          },
+                        ),
+                        _buildDivider(),
+                        ListTile(
+                          leading: Icon(
+                            FontAwesomeIcons.video,
+                            color: Colors.purple,
+                          ),
+                          title: Text("Tutorials"),
+                          trailing: Icon(Icons.keyboard_arrow_right),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  SliderScreen()));
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Center(
+                  child : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  Column(
+
+                  children: [
+
+                    Container(
+                      margin: EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        'Our App',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purpleAccent,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 150.0,
+                      height: 300.0,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade800,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            'Tune your guitar with ease using our app. Enjoy a user-friendly interface, real-time feedback, and a variety of tuning options. Perfect for all skill levels - beginner to pro',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ],
+                  ),
+                      SizedBox(width: 16.0),
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        'Services',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purpleAccent,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 150.0,
+                      height: 300.0,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade800,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 10.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.all(10.0),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.video,
+                                      color: Colors.purple,
+                                    ),
+                                    SizedBox(height: 5.0),
+                                    Text('Tutorials\n Articles', style: TextStyle(color: Colors.white)),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 20.0),
+                              Column(
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.guitar,
+                                    color: Colors.purple,
+                                  ),
+                                  SizedBox(height: 5.0),
+                                  Text('Guitar \nTuner ', style: TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.all(10.0),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.user,
+                                      color: Colors.purple,
+                                    ),
+                                    SizedBox(height: 5.0),
+                                    Text('   User\nFriendly', style: TextStyle(color: Colors.white)),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 20.0),
+                              Column(
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.fileAudio,
+                                    color: Colors.purple,
+                                  ),
+                                  SizedBox(height: 5.0),
+                                  Text('  Audio\nrecorder', style: TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.all(10.0),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      FontAwesomeIcons.moneyBill,
+                                      color: Colors.purple,
+                                    ),
+                                    SizedBox(height: 5.0),
+                                    Text('   Free\nService', style: TextStyle(color: Colors.white)),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 20.0),
+                              Column(
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.music,
+                                    color: Colors.purple,
+                                  ),
+                                  SizedBox(height: 5.0),
+                                  Text('RealTime\n  Tuning',style: TextStyle(color: Colors.white),),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ],
+                  )
+                ]
+                  )
+                  )
                 ],
-              ))
-        ]),
+              ),
+              ]
+            ),
+            )
+          ],
+        ),
       ),
+    );
+  }
+
+  Container _buildDivider() {
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 8.0,
+      ),
+      width: double.infinity,
+      height: 1.0,
+      color: Colors.grey.shade400,
     );
   }
 }

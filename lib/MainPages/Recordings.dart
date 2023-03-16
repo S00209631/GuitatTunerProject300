@@ -53,10 +53,12 @@ class _RecorderPageState extends State<RecorderPage> {
         child: NavigationDrawer(),
       ),
       appBar: AppBar(
+        centerTitle: true,
 
         backgroundColor: Colors.transparent,
         title: Text(widget.title),
       ),
+
       body: FutureBuilder<String>(
           future: DefaultAssetBundle.of(context).loadString("AssetManifest.json"),
           builder: (context, item){
@@ -64,25 +66,31 @@ class _RecorderPageState extends State<RecorderPage> {
               Map? jsonMap = json.decode(item.data!);
               List? songs = jsonMap?.keys.toList();
               return ListView.builder(
+
                 itemCount: songs?.length,
                 itemBuilder: (context, index){
+
                   var path = songs![index].toString();
                   var title = path.split("/").last.toString();
                   title = title.replaceAll("%20", "");
                   title = title.split(".").first;
-                  return Container(
-                    margin: const EdgeInsets.only(top: 10.0, left: 15.0, right: 15.0),
-                    padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                    child: ListTile(
-                      title: Text(title),
-                      subtitle: Text("path: $path"),
-                      leading: const Icon(Icons.audiotrack, size: 20,),
-                      onTap: () async{
-                        await _player.setAsset(path);
-                        await _player.play();
-                      },
-
-                    ),
+                  return Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 10.0, left: 15.0, right: 15.0),
+                        padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
+                        child: ListTile(
+                          title: Text(title),
+                          subtitle: Text("path: $path"),
+                          leading: const Icon(Icons.audiotrack, size: 20,),
+                          onTap: () async{
+                            await _player.setAsset(path);
+                            await _player.play();
+                          },
+                        ),
+                      ),
+                      Divider(color: Colors.white),
+                    ],
                   );
 
                 },

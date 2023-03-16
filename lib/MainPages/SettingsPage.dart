@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:project/MainPages/ResetPassword.dart';
+
+import '../NavigationBar/naviigation_drawer.dart';
+import '../config.dart';
 
 class SettingsOnePage extends StatefulWidget {
   static final String path = "lib/src/pages/settings/settings1.dart";
@@ -14,7 +18,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
   @override
   void initState() {
     super.initState();
-    _dark = false;
+    _dark = true;
   }
 
   Brightness _getBrightness() {
@@ -28,27 +32,21 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         brightness: _getBrightness(),
       ),
       child: Scaffold(
-        backgroundColor: _dark ? null : Colors.grey.shade200,
+        backgroundColor: backgroundColor,
+        drawer: const Drawer(
+          backgroundColor: backgroundColor,
+          child: NavigationDrawer(),
+        ),
         appBar: AppBar(
 
+          centerTitle: true,
           elevation: 0,
           brightness: _getBrightness(),
-          iconTheme: IconThemeData(color: _dark ? Colors.white : Colors.black),
           backgroundColor: Colors.transparent,
           title: Text(
             'Settings',
             style: TextStyle(color: _dark ? Colors.white : Colors.black),
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(FontAwesomeIcons.moon),
-              onPressed: () {
-                setState(() {
-                  _dark = !_dark;
-                });
-              },
-            )
-          ],
         ),
         body: Stack(
           fit: StackFit.expand,
@@ -74,10 +72,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      trailing: Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                      ),
+
                     ),
                   ),
                   const SizedBox(height: 10.0),
@@ -96,7 +91,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                           title: Text("Change Password"),
                           trailing: Icon(Icons.keyboard_arrow_right),
                           onTap: () {
-                            //open change password
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  ResetPassword()));
                           },
                         ),
                         _buildDivider(),
@@ -114,10 +109,10 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         _buildDivider(),
                         ListTile(
                           leading: Icon(
-                            Icons.location_on,
+                            Icons.email_outlined,
                             color: Colors.purple,
                           ),
-                          title: Text("Change Location"),
+                          title: Text("Change Email"),
                           trailing: Icon(Icons.keyboard_arrow_right),
                           onTap: () {
                             //open change location
@@ -174,25 +169,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 width: 80,
                 height: 80,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.purple,
-                  shape: BoxShape.circle,
-                ),
+
               ),
             ),
-            Positioned(
-              bottom: 00,
-              left: 00,
-              child: IconButton(
-                icon: Icon(
-                  FontAwesomeIcons.powerOff,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  //log out
-                },
-              ),
-            )
           ],
         ),
       ),
